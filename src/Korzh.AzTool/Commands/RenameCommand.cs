@@ -90,28 +90,24 @@ namespace Korzh.AzTool
             foreach (var container in blobClient.ListContainers()) {
 
                 foreach (var blob in container.ListBlobs()) {
+
                     string blobName = null;
-                    if (blob is CloudBlockBlob) {
-                        blobName = (blob as CloudBlockBlob).Name;
-                    }
-                    else if (blob is CloudPageBlob) {
-                        blobName = (blob as CloudPageBlob).Name;
-                    }
-                    else if (blob is CloudAppendBlob) {
-                        blobName = (blob as CloudAppendBlob).Name;
+                    if (blob is CloudBlob) {
+                        blobName = (blob as CloudBlob).Name;
                     }
                     else if (blob is CloudBlobDirectory) {
                         //do nothing for the moment
+                     
                     }
-
 
                     if (blobName != null) {
                         var newName = _arguments.OldNameRegex.Replace(blobName, _arguments.NewNamePattern);
                         if (newName != blobName) {
                             try {
                                 Console.Write("Renaming blob '{0}' -> '{1}'...", blobName, newName);
-                                container.Rename(blobName, newName);
+                                container.RenameBlob(blob as CloudBlob, newName);
                                 Console.WriteLine("OK!");
+                                count++;
                             }
                             catch (BlobRenameException ex) {
                                 Console.WriteLine(ex.Message);

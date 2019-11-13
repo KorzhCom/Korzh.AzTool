@@ -15,18 +15,27 @@ namespace Korzh.AzTool
 
     public static class BlobContainerExtensions
     {
-        public static void Rename(this CloudBlobContainer container, string oldName, string newName)
+        public static void RenameBlob(this CloudBlobContainer container, CloudBlob blob, string newName)
         {
-            RenameAsync(container, oldName, newName).GetAwaiter().GetResult();
+            RenameBlobAsync(container, blob, newName).GetAwaiter().GetResult();
         }
 
-        public static async Task RenameAsync(this CloudBlobContainer container, string oldName, string newName)
+        public static async Task RenameBlobAsync(this CloudBlobContainer container, CloudBlob blob, string newName)
         {
 
-            var source = await container.GetBlobReferenceFromServerAsync(oldName);
-            var target = container.GetBlockBlobReference(newName);
+            CloudBlob target = null;
 
-            await target.StartCopyAsync(source.Uri);
+            if (blob is CloudBlockBlob) {
+                target = container.GetBlockBlobReference(newName);
+            }
+            else if (blob is CloudPageBlob) {
+                target = container.GetPageBlobReference(newName);
+            }
+            else if (blob is CloudAppendBlob) {
+                target = container.GetAppendBlobReference(newName);
+            }
+
+            await target.StartCopyAsync(blob.Uri);
 
             while (target.CopyState.Status == CopyStatus.Pending)
                 await Task.Delay(0);
@@ -35,7 +44,7 @@ namespace Korzh.AzTool
                 throw new BlobRenameException("Rename failed: " + target.CopyState.Status);
             }
 
-            await source.DeleteAsync();
+            await blob.DeleteAsync();
         }
     }
 }
