@@ -34,7 +34,6 @@ namespace Korzh.AzTool
             app.Name = "aztool";
             app.HelpOption("-?|-h|--help");
 
-
             app.Command("rename", c => RenameCommand.Configure(c));
 
             app.OnExecute(new RootCommand(app).Run);
