@@ -161,10 +161,10 @@ namespace Korzh.AzTool
 
             var connections = storage.List();
             Console.WriteLine($"Connections (global): ");
-            Console.WriteLine("\"{1}\": \"{2}\"", "local", Settings.LocalConnectionString);
+            Console.WriteLine("\"{0}\": \"{1}\"", "local", Settings.LocalConnectionString);
             if (connections.Any()) {
                 foreach (var connection in connections) {
-                    Console.WriteLine("\"{1}\": \"{2}\"", connection.ConnectionId, connection.ConnectionString);
+                    Console.WriteLine("\"{0}\": \"{1}\"", connection.ConnectionId, connection.ConnectionString);
                 }
             }
 
