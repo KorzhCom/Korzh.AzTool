@@ -8,7 +8,7 @@ using Microsoft.Azure.Storage.Blob;
 
 namespace Korzh.AzTool
 {
-    public class RenameCommand : ICommand
+    public class RenameBlobsCommand : ICommand
     {
 
         internal class Arguments 
@@ -58,7 +58,7 @@ namespace Korzh.AzTool
 
         private readonly Arguments _arguments;
 
-        internal RenameCommand(Arguments arguments) 
+        internal RenameBlobsCommand(Arguments arguments) 
         {
             _arguments = arguments;
         }
@@ -68,7 +68,7 @@ namespace Korzh.AzTool
             command.Description = "Renames blobs by regex pattern";
 
             var arguments = new Arguments(command);
-            command.OnExecute(new RenameCommand(arguments).Run);
+            command.OnExecute(new RenameBlobsCommand(arguments).Run);
         }
 
         public int Run()
