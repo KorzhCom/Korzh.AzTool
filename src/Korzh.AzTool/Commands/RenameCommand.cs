@@ -86,22 +86,41 @@ namespace Korzh.AzTool
         private void RenameBlobs(CloudStorageAccount account)
         {
             var blobClient = account.CreateCloudBlobClient();
+            int count = 0;
             foreach (var container in blobClient.ListContainers()) {
-                foreach (CloudBlockBlob blob in container.ListBlobs()) {
 
-                    var newName = _arguments.OldNameRegex.Replace(blob.Name, _arguments.NewNamePattern);
-                    if (newName != blob.Name) {
-                        try {
-                            Console.WriteLine("Start rename blob '{0}' -> '{1}'", blob.Name, newName);
-                            container.Rename(blob.Name, newName);
-                            Console.WriteLine("Renamed successfully");
-                        }
-                        catch (BlobRenameException ex) {
-                            Console.WriteLine(ex.Message);
+                foreach (var blob in container.ListBlobs()) {
+                    string blobName = null;
+                    if (blob is CloudBlockBlob) {
+                        blobName = (blob as CloudBlockBlob).Name;
+                    }
+                    else if (blob is CloudPageBlob) {
+                        blobName = (blob as CloudPageBlob).Name;
+                    }
+                    else if (blob is CloudAppendBlob) {
+                        blobName = (blob as CloudAppendBlob).Name;
+                    }
+                    else if (blob is CloudBlobDirectory) {
+                        //do nothing for the moment
+                    }
+
+
+                    if (blobName != null) {
+                        var newName = _arguments.OldNameRegex.Replace(blobName, _arguments.NewNamePattern);
+                        if (newName != blobName) {
+                            try {
+                                Console.Write("Renaming blob '{0}' -> '{1}'...", blobName, newName);
+                                container.Rename(blobName, newName);
+                                Console.WriteLine("OK!");
+                            }
+                            catch (BlobRenameException ex) {
+                                Console.WriteLine(ex.Message);
+                            }
                         }
                     }
                 }
             }
+            Console.WriteLine($"Done! {count} renames were performed");
         }
 
         private CloudStorageAccount GetStorageAccount() 
