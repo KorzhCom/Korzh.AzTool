@@ -36,6 +36,7 @@ namespace Korzh.AzTool
 
             app.Command("connections", c => ConnectionsCommand.Configure(c));
             app.Command("renameblobs", c => RenameBlobsCommand.Configure(c));
+            app.Command("copy", c => CopyCommand.Configure(c));
 
             app.OnExecute(new RootCommand(app).Run);
         }
